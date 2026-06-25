@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { SelectedImageProvider } from '@/contexts/SelectedImageContext';
 
 function RootNavigator() {
   const { user, isLoading } = useAuth();
@@ -30,7 +31,9 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootNavigator />
+      <SelectedImageProvider>
+        <RootNavigator />
+      </SelectedImageProvider>
     </AuthProvider>
   );
 }

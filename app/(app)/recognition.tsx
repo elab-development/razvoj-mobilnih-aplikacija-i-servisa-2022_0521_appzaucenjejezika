@@ -1,0 +1,165 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+
+import { AppScreenLayout } from '@/components/AppScreenLayout';
+import { PrimaryButton } from '@/components/PrimaryButton';
+import { useSelectedImage } from '@/contexts/SelectedImageContext';
+
+export default function RecognitionScreen() {
+  const { selectedImage } = useSelectedImage();
+  const [savedImageUri, setSavedImageUri] = useState<string | null>(null);
+
+  const imageUri = selectedImage?.uri ?? null;
+  const imageSize = useMemo(() => {
+    const width = selectedImage?.width;
+    const height = selectedImage?.height;
+
+    if (
+      typeof width !== 'number' ||
+      typeof height !== 'number' ||
+      !Number.isFinite(width) ||
+      !Number.isFinite(height) ||
+      width <= 0 ||
+      height <= 0
+    ) {
+      return null;
+    }
+
+    return `${Math.round(width)} x ${Math.round(height)} px`;
+  }, [selectedImage?.height, selectedImage?.width]);
+
+  const handleSaveLocal = () => {
+    if (!imageUri) {
+      Alert.alert('Greska', 'Nema slike za cuvanje.');
+      return;
+    }
+
+    setSavedImageUri(imageUri);
+  };
+
+  if (!imageUri) {
+    return (
+      <AppScreenLayout
+        title="Recognition"
+        subtitle="Slika nije prosledjena. Vratite se na skeniranje i izaberite novu sliku."
+      >
+        <View style={styles.emptyPanel}>
+          <Ionicons name="image-outline" size={44} color="#8A9994" />
+          <Text style={styles.emptyText}>Nema slike za prikaz.</Text>
+        </View>
+
+        <PrimaryButton title="Nazad na skeniranje" onPress={() => router.back()} />
+      </AppScreenLayout>
+    );
+  }
+
+  return (
+    <AppScreenLayout
+      title="Recognition"
+      subtitle="Ovde ce se kasnije vrsiti prepoznavanje predmeta. Za sada mozete lokalno sacuvati izabranu sliku."
+    >
+      <View style={styles.previewPanel}>
+        <Image source={{ uri: imageUri }} style={styles.previewImage} contentFit="cover" />
+
+        <View style={styles.metaBox}>
+          <Text style={styles.metaLabel}>Slika</Text>
+          <Text style={styles.metaValue} numberOfLines={1}>
+            {selectedImage?.fileName ?? 'selected-image'}
+          </Text>
+
+          {imageSize ? (
+            <>
+              <Text style={styles.metaLabel}>Dimenzije</Text>
+              <Text style={styles.metaValue}>{imageSize}</Text>
+            </>
+          ) : null}
+        </View>
+      </View>
+
+      <PrimaryButton title="Sacuvaj lokalno" onPress={handleSaveLocal} />
+
+      {savedImageUri ? (
+        <View style={styles.savedPanel}>
+          <View style={styles.savedHeader}>
+            <Ionicons name="checkmark-circle" size={22} color="#155E63" />
+            <Text style={styles.savedTitle}>Slika je sacuvana lokalno</Text>
+          </View>
+          <Image source={{ uri: savedImageUri }} style={styles.savedImage} contentFit="cover" />
+        </View>
+      ) : null}
+    </AppScreenLayout>
+  );
+}
+
+const styles = StyleSheet.create({
+  previewPanel: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D6E0DC',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  previewImage: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    backgroundColor: '#EFF7F4',
+  },
+  metaBox: {
+    padding: 16,
+    gap: 6,
+  },
+  metaLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#8A9994',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  metaValue: {
+    fontSize: 16,
+    color: '#13221F',
+    marginBottom: 8,
+  },
+  savedPanel: {
+    backgroundColor: '#EFF7F4',
+    borderWidth: 1,
+    borderColor: '#BFD1CC',
+    borderRadius: 8,
+    padding: 14,
+    gap: 12,
+  },
+  savedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  savedTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#155E63',
+  },
+  savedImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  emptyPanel: {
+    minHeight: 260,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D6E0DC',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64746F',
+  },
+});

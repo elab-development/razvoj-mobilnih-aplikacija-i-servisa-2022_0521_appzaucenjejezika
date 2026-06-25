@@ -38,6 +38,12 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="recognition"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name="dictionary"
         options={{
           title: 'Dictionary',

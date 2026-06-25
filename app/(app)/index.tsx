@@ -1,14 +1,93 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { AppScreenLayout } from '@/components/AppScreenLayout';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { useSelectedImage } from '@/contexts/SelectedImageContext';
 
 export default function ScanScreen() {
+  const { setSelectedImage } = useSelectedImage();
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+
+  const openRecognitionScreen = (asset: ImagePicker.ImagePickerAsset) => {
+    setSelectedImage({
+      uri: asset.uri,
+      width: asset.width,
+      height: asset.height,
+      fileName: asset.fileName,
+    });
+    router.push('./recognition');
+  };
+
+  const handleOpenCamera = async () => {
+    setCameraLoading(true);
+
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          'Dozvola je potrebna',
+          'Dozvolite pristup kameri da biste slikali predmet.',
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.9,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        openRecognitionScreen(result.assets[0]);
+      }
+    } catch {
+      Alert.alert('Greska', 'Kamera nije mogla da se otvori.');
+    } finally {
+      setCameraLoading(false);
+    }
+  };
+
+  const handlePickFromGallery = async () => {
+    setGalleryLoading(true);
+
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          'Dozvola je potrebna',
+          'Dozvolite pristup galeriji da biste izabrali sliku.',
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.9,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        openRecognitionScreen(result.assets[0]);
+      }
+    } catch {
+      Alert.alert('Greska', 'Galerija nije mogla da se otvori.');
+    } finally {
+      setGalleryLoading(false);
+    }
+  };
+
   return (
     <AppScreenLayout
       title="Scan"
-      subtitle="Prepoznajte predmet kamerom ili iz galerije, zatim sačuvajte prevod u privatni rečnik."
+      subtitle="Prepoznajte predmet kamerom ili iz galerije, zatim sacuvajte prevod u privatni recnik."
     >
       <View style={styles.scannerPanel}>
         <View style={styles.viewfinder}>
@@ -17,11 +96,16 @@ export default function ScanScreen() {
         </View>
 
         <View style={styles.actions}>
-          <PrimaryButton title="Otvori kameru" onPress={() => undefined} />
+          <PrimaryButton
+            title="Otvori kameru"
+            loading={cameraLoading}
+            onPress={handleOpenCamera}
+          />
           <PrimaryButton
             title="Izaberi iz galerije"
             variant="secondary"
-            onPress={() => undefined}
+            loading={galleryLoading}
+            onPress={handlePickFromGallery}
           />
         </View>
       </View>

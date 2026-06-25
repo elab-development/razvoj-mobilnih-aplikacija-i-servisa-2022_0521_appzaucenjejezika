@@ -28,6 +28,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "VizDict koristi galeriju da izaberete sliku predmeta za prevod.",
+          "cameraPermission": "VizDict koristi kameru da slikate predmet za prevod.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
