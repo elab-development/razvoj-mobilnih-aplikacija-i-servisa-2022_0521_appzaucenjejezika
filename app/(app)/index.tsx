@@ -2,14 +2,19 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AppScreenLayout } from '@/components/AppScreenLayout';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { useSelectedImage } from '@/contexts/SelectedImageContext';
+import { LANGUAGE_OPTIONS } from '@/lib/languages';
 
 export default function ScanScreen() {
-  const { setSelectedImage } = useSelectedImage();
+  const {
+    setSelectedImage,
+    targetLanguage,
+    setTargetLanguageCode,
+  } = useSelectedImage();
   const [cameraLoading, setCameraLoading] = useState(false);
   const [galleryLoading, setGalleryLoading] = useState(false);
 
@@ -19,6 +24,7 @@ export default function ScanScreen() {
       width: asset.width,
       height: asset.height,
       fileName: asset.fileName,
+      mimeType: asset.mimeType,
     });
     router.push('./recognition');
   };
@@ -40,7 +46,7 @@ export default function ScanScreen() {
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.9,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -71,7 +77,7 @@ export default function ScanScreen() {
         mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.9,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -112,9 +118,33 @@ export default function ScanScreen() {
 
       <View style={styles.translationPanel}>
         <Text style={styles.panelLabel}>Jezik prevoda</Text>
-        <View style={styles.languageRow}>
-          <Text style={styles.languageValue}>Engleski</Text>
-          <Ionicons name="chevron-down" size={20} color="#155E63" />
+        <View style={styles.languageGrid}>
+          {LANGUAGE_OPTIONS.map((language) => {
+            const isSelected = language.code === targetLanguage.code;
+
+            return (
+              <Pressable
+                key={language.code}
+                style={[
+                  styles.languageOption,
+                  isSelected && styles.languageOptionSelected,
+                ]}
+                onPress={() => setTargetLanguageCode(language.code)}
+              >
+                <Text
+                  style={[
+                    styles.languageValue,
+                    isSelected && styles.languageValueSelected,
+                  ]}
+                >
+                  {language.label}
+                </Text>
+                {isSelected ? (
+                  <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                ) : null}
+              </Pressable>
+            );
+          })}
         </View>
       </View>
     </AppScreenLayout>
@@ -164,14 +194,33 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  languageRow: {
+  languageGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  languageOption: {
+    minHeight: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D6E0DC',
+    paddingHorizontal: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  languageOptionSelected: {
+    backgroundColor: '#155E63',
+    borderColor: '#155E63',
   },
   languageValue: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#13221F',
+    color: '#155E63',
+  },
+  languageValueSelected: {
+    color: '#FFFFFF',
   },
 });
