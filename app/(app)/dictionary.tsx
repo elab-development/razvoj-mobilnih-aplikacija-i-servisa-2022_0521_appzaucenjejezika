@@ -1,72 +1,34 @@
-import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { getDownloadURL, ref } from 'firebase/storage';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AppScreenLayout } from '@/components/AppScreenLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { db, storage } from '@/lib/firebase';
-import { DEFAULT_LANGUAGE, LANGUAGE_OPTIONS, type LanguageCode } from '@/lib/languages';
-import type { DictionaryEntry, RecognitionConfidence } from '@/types/dictionary';
+import { parseDictionaryEntry } from '@/lib/dictionary';
+import { db } from '@/lib/firebase';
+import { LANGUAGE_OPTIONS, type LanguageCode, type LanguageOption } from '@/lib/languages';
+import type { DictionaryEntry } from '@/types/dictionary';
 
-function asStringArray(value: unknown) {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
+type LanguageSummary = {
+  language: LanguageOption;
+  count: number;
+  latestEntry: DictionaryEntry | null;
+};
 
-function asConfidence(value: unknown): RecognitionConfidence {
-  if (value === 'high' || value === 'medium' || value === 'low') {
-    return value;
-  }
-
-  return 'medium';
-}
-
-function asLanguageCode(value: unknown): LanguageCode {
-  if (
-    typeof value === 'string' &&
-    LANGUAGE_OPTIONS.some((language) => language.code === value)
-  ) {
-    return value as LanguageCode;
-  }
-
-  return DEFAULT_LANGUAGE.code;
-}
-
-function DictionaryThumbnail({ imagePath }: { imagePath: string }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    getDownloadURL(ref(storage, imagePath))
-      .then((url) => {
-        if (isMounted) {
-          setImageUrl(url);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setImageUrl(null);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [imagePath]);
-
-  if (!imageUrl) {
-    return (
-      <View style={styles.thumbnailFallback}>
-        <Text style={styles.thumbnailFallbackText}>?</Text>
-      </View>
+  function buildLanguageSummaries(entries: DictionaryEntry[]): LanguageSummary[] {
+  return LANGUAGE_OPTIONS.map((language) => {
+    const languageEntries = entries.filter(
+      (entry) => entry.targetLanguageCode === language.code,
     );
-  }
 
-  return <Image source={{ uri: imageUrl }} style={styles.thumbnail} contentFit="cover" />;
+return {
+      language,
+      count: languageEntries.length,
+      latestEntry: languageEntries[0] ?? null,
+    };
+  });
 }
 
 export default function DictionaryScreen() {
@@ -90,40 +52,9 @@ export default function DictionaryScreen() {
     return onSnapshot(
       dictionaryQuery,
       (snapshot) => {
-        const nextEntries = snapshot.docs.map((document) => {
-          const data = document.data();
-
-          return {
-            id: document.id,
-            sourceWord:
-              typeof data.sourceWord === 'string' ? data.sourceWord : 'unknown',
-            translatedWord:
-              typeof data.translatedWord === 'string'
-                ? data.translatedWord
-                : 'unknown',
-            targetLanguageCode: asLanguageCode(data.targetLanguageCode),
-            targetLanguageLabel:
-              typeof data.targetLanguageLabel === 'string'
-                ? data.targetLanguageLabel
-                : 'Engleski',
-            description:
-              typeof data.description === 'string' ? data.description : '',
-            examples: asStringArray(data.examples),
-            alternatives: asStringArray(data.alternatives),
-            confidence: asConfidence(data.confidence),
-            imagePath:
-              typeof data.imagePath === 'string' ? data.imagePath : '',
-            imageFileName:
-              typeof data.imageFileName === 'string' ? data.imageFileName : null,
-            imageWidth:
-              typeof data.imageWidth === 'number' ? data.imageWidth : null,
-            imageHeight:
-              typeof data.imageHeight === 'number' ? data.imageHeight : null,
-            model: typeof data.model === 'string' ? data.model : undefined,
-            createdAtIso:
-              typeof data.createdAtIso === 'string' ? data.createdAtIso : undefined,
-          } satisfies DictionaryEntry;
-        });
+        const nextEntries = snapshot.docs.map((document) =>
+          parseDictionaryEntry(document.id, document.data()),
+        );
 
         setEntries(nextEntries);
         setError(null);
@@ -136,15 +67,35 @@ export default function DictionaryScreen() {
     );
   }, [user]);
 
+   const summaries = useMemo(() => buildLanguageSummaries(entries), [entries]);
+  const totalEntries = entries.length;
+
+  const openLanguage = (languageCode: LanguageCode) => {
+    router.push({
+      pathname: '/dictionary/[languageCode]',
+      params: { languageCode },
+    });
+  };
+
   return (
     <AppScreenLayout
       title="Dictionary"
-      subtitle="Privatna lista predmeta, prevoda i primera koje ste sacuvali."
-    >
+       subtitle="Izaberite jezik i otvorite sve predmete koje ste sacuvali za taj prevod."
+       >
+         <View style={styles.statsPanel}>
+        <View>
+          <Text style={styles.statsLabel}>Ukupno reci</Text>
+          <Text style={styles.statsValue}>{totalEntries}</Text>
+        </View>
+        <View style={styles.statsIcon}>
+          <Ionicons name="library-outline" size={24} color="#155E63" />
+        </View>
+      </View>
+
       {loading ? (
         <View style={styles.statePanel}>
           <ActivityIndicator color="#155E63" />
-          <Text style={styles.stateText}>Ucitavanje recnika...</Text>
+          <Text style={styles.stateText}>Ucitavanje jezika...</Text>
         </View>
       ) : null}
 
@@ -154,132 +105,79 @@ export default function DictionaryScreen() {
         </View>
       ) : null}
 
-      {!loading && !error && !entries.length ? (
-        <View style={styles.statePanel}>
-          <Text style={styles.emptyTitle}>Recnik je jos prazan.</Text>
-          <Text style={styles.stateText}>
-            Skenirajte predmet i pokrenite prepoznavanje da biste dodali prvi unos.
-          </Text>
-        </View>
-      ) : null}
+       {!loading && !error ? (
+        <View style={styles.languageGrid}>
+          {summaries.map(({ language, count, latestEntry }) => (
+            <Pressable
+              key={language.code}
+              style={({ pressed }) => [
+                styles.languageCard,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => openLanguage(language.code)}
+            >
+              <View style={styles.cardTopRow}>
+                <View style={styles.languageIcon}>
+                  <Text style={styles.languageCode}>{language.code}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#8A9994" />
+              </View>
 
-      {entries.map((entry) => (
-        <View key={entry.id} style={styles.wordCard}>
-          {entry.imagePath ? <DictionaryThumbnail imagePath={entry.imagePath} /> : null}
-
-          <View style={styles.wordContent}>
-            <View style={styles.wordHeader}>
-              <View style={styles.wordTitleBox}>
-                <Text style={styles.translated}>{entry.translatedWord}</Text>
-                <Text style={styles.language}>
-                  {entry.sourceWord} - {entry.targetLanguageLabel}
+           <View>
+                <Text style={styles.languageTitle}>{language.label}</Text>
+                <Text style={styles.languageMeta}>
+                  {count === 1 ? '1 unos' : `${count} unosa`}
                 </Text>
               </View>
-              <View style={styles.confidencePill}>
-                <Text style={styles.confidenceText}>{entry.confidence}</Text>
-              </View>
-            </View>
 
-            {entry.description ? (
-              <Text style={styles.description}>{entry.description}</Text>
-            ) : null}
-
-            {entry.examples.length ? (
-              <View style={styles.examples}>
-                {entry.examples.slice(0, 2).map((example) => (
-                  <Text key={example} style={styles.example}>
-                    {example}
-                  </Text>
-                ))}
+               <View style={styles.latestBox}>
+                <Text style={styles.latestLabel}>Poslednje dodato</Text>
+                <Text style={styles.latestValue} numberOfLines={1}>
+                  {latestEntry
+                    ? `${latestEntry.translatedWord} (${latestEntry.sourceWord})`
+                    : 'Nema unosa'}
+                </Text>
               </View>
-            ) : null}
-          </View>
+            </Pressable>
+          ))}
         </View>
-      ))}
+       ) : null}
     </AppScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  wordCard: {
+  statsPanel: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#D6E0DC',
     borderRadius: 8,
-    padding: 16,
+    padding: 18,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 14,
+     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  thumbnail: {
-    width: 68,
-    height: 68,
-    borderRadius: 8,
-    backgroundColor: '#EFF7F4',
+statsLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#64746F',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  thumbnailFallback: {
-    width: 68,
-    height: 68,
+  statsValue: {
+    marginTop: 4,
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#13221F',
+  },
+  statsIcon: {
+    width: 48,
+    height: 48,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#EFF7F4',
-    borderWidth: 1,
-    borderColor: '#D6E0DC',
-  },
-  thumbnailFallbackText: {
-    color: '#64746F',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  wordContent: {
-    flex: 1,
-    gap: 10,
-  },
-  wordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  wordTitleBox: {
-    flex: 1,
-  },
-  language: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#64746F',
-  },
-  translated: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#13221F',
-  },
-  description: {
-    fontSize: 14,
-    color: '#2F413D',
-    lineHeight: 20,
-  },
-  examples: {
-    gap: 6,
-  },
-  example: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: '#155E63',
-  },
-  confidencePill: {
-    borderRadius: 8,
-    backgroundColor: '#EFF7F4',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    alignSelf: 'flex-start',
-  },
-  confidenceText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#155E63',
-    textTransform: 'uppercase',
-  },
+     },
   statePanel: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -289,16 +187,71 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#13221F',
-    textAlign: 'center',
-  },
-  stateText: {
+stateText: {
     fontSize: 14,
     lineHeight: 20,
     color: '#64746F',
-    textAlign: 'center',
+     textAlign: 'center',
+  },
+  languageGrid: {
+    gap: 12,
+  },
+   languageCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D6E0DC',
+    borderRadius: 8,
+    padding: 16,
+    gap: 14,
+  },
+ cardPressed: {
+    opacity: 0.88,
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+ languageIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#155E63',
+  },
+  languageCode: {
+    color: '#FFFFFF',
+    fontSize: 13,
+   fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+languageTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#13221F',
+  },
+  languageMeta: {
+    marginTop: 4,
+    fontSize: 14,
+     color: '#64746F',
+  },
+   latestBox: {
+    borderTopWidth: 1,
+    borderTopColor: '#D6E0DC',
+    paddingTop: 12,
+    gap: 4,
+  },
+  latestLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#8A9994',
+    textTransform: 'uppercase',
+     letterSpacing: 0.5,
+  },
+  latestValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#155E63',
   },
 });

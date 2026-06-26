@@ -52,6 +52,18 @@ export default function AppLayout() {
           ),
         }}
       />
+       <Tabs.Screen
+        name="dictionary/[languageCode]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="dictionary/[languageCode]/[entryId]"
+        options={{
+          href: null,
+        }}
+      />
       <Tabs.Screen
         name="profile"
         options={{
