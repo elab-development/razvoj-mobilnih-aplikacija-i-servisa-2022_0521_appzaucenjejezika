@@ -73,6 +73,12 @@ export default function AppLayout() {
           ),
         }}
       />
+         <Tabs.Screen
+        name="stats"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
