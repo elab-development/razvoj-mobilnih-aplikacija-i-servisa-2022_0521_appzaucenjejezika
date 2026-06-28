@@ -1,22 +1,34 @@
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    type TextInputProps,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  type TextInputProps,
+  View,
 } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 type AuthTextFieldProps = TextInputProps & {
   label: string;
 };
 
 export function AuthTextField({ label, style, ...props }: AuthTextFieldProps) {
+    const { theme } = useTheme();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: theme.colors.text }]}>{label}</Text>
       <TextInput
-        placeholderTextColor="#8A9994"
-        style={[styles.input, style]}
+        placeholderTextColor={theme.colors.textSoft}
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border,
+            color: theme.colors.text,
+          },
+          style,
+        ]}
         {...props}
       />
     </View>
@@ -30,16 +42,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2F413D',
   },
   input: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D6E0DC',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#13221F',
   },
 });

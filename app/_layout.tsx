@@ -3,15 +3,17 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SelectedImageProvider } from '@/contexts/SelectedImageContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
 function RootNavigator() {
   const { user, isLoading } = useAuth();
+  const { theme } = useTheme();
 
   if (isLoading) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#155E63" />
-      </View>
+       <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.accent} />
+        </View>
     );
   }
 
@@ -30,11 +32,13 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <SelectedImageProvider>
-        <RootNavigator />
-      </SelectedImageProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SelectedImageProvider>
+          <RootNavigator />
+        </SelectedImageProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -43,6 +47,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F7FAF8',
-  },
+    },
 });

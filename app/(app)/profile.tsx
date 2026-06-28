@@ -6,9 +6,49 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { AppScreenLayout } from '@/components/AppScreenLayout';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+
+type ProfileActionCardProps = {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  text: string;
+  onPress: () => void;
+};
+
+function ProfileActionCard({ icon, title, text, onPress }: ProfileActionCardProps) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.actionCard,
+        {
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.border,
+        },
+        pressed && styles.cardPressed,
+      ]}
+      onPress={onPress}
+    >
+      <View style={[styles.actionIcon, { backgroundColor: theme.colors.accentSoft }]}>
+        <Ionicons name={icon} size={24} color={theme.colors.accent} />
+      </View>
+
+      <View style={styles.actionContent}>
+        <Text style={[styles.actionTitle, { color: theme.colors.text }]}>{title}</Text>
+        <Text style={[styles.actionText, { color: theme.colors.textMuted }]}>
+          {text}
+        </Text>
+      </View>
+
+      <Ionicons name="chevron-forward" size={20} color={theme.colors.textSoft} />
+    </Pressable>
+  );
+}
 
 export default function ProfileScreen() {
   const { profile, logout } = useAuth();
+   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -28,32 +68,42 @@ export default function ProfileScreen() {
       title="Profile"
       subtitle="Detalji naloga koji koristi vas privatni recnik."
     >
-      <View style={styles.card}>
-        <Text style={styles.name}>{profile?.name ?? 'Korisnik'}</Text>
-
-        <View style={styles.infoBox}>
-          <Text style={styles.infoLabel}>Email</Text>
-          <Text style={styles.infoValue}>{profile?.email ?? '-'}</Text>
-        </View>
-      </View>
-
-      <Pressable
-        style={({ pressed }) => [styles.actionCard, pressed && styles.cardPressed]}
-        onPress={() => router.push('/stats')}
+       <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border,
+          },
+        ]}
       >
-        <View style={styles.actionIcon}>
-          <Ionicons name="analytics-outline" size={24} color="#155E63" />
-        </View>
+         <Text style={[styles.name, { color: theme.colors.text }]}>
+          {profile?.name ?? 'Korisnik'}
+        </Text>
 
-        <View style={styles.actionContent}>
-          <Text style={styles.actionTitle}>Statistika koriscenja</Text>
-          <Text style={styles.actionText}>
-            Pregled sacuvanih reci po jezicima, mesecima i ritmu koriscenja.
+         <View style={[styles.infoBox, { borderTopColor: theme.colors.border }]}>
+          <Text style={[styles.infoLabel, { color: theme.colors.textSoft }]}>
+            Email
+          </Text>
+          <Text style={[styles.infoValue, { color: theme.colors.text }]}>
+            {profile?.email ?? '-'}
           </Text>
         </View>
+</View>
 
-        <Ionicons name="chevron-forward" size={20} color="#8A9994" />
-      </Pressable>
+      <ProfileActionCard
+        icon="settings-outline"
+        title="Settings"
+        text="Promenite boju aplikacije i izaberite light ili dark temu."
+        onPress={() => router.push('/settings')}
+      />
+
+        <ProfileActionCard
+        icon="analytics-outline"
+        title="Statistika koriscenja"
+        text="Pregled sacuvanih reci po jezicima, mesecima i ritmu koriscenja."
+        onPress={() => router.push('/stats')}
+      />
 
       <PrimaryButton
         title="Odjavi se"
@@ -67,42 +117,34 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#D6E0DC',
     gap: 12,
   },
   name: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#13221F',
-  },
+   },
   infoBox: {
     marginTop: 8,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#D6E0DC',
     gap: 6,
   },
   infoLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#8A9994',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   infoValue: {
     fontSize: 16,
-    color: '#13221F',
   },
   actionCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#D6E0DC',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
@@ -114,7 +156,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 8,
-    backgroundColor: '#EFF7F4',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -125,11 +166,9 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#13221F',
   },
   actionText: {
     fontSize: 13,
     lineHeight: 19,
-    color: '#64746F',
   },
 });

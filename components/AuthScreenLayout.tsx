@@ -1,12 +1,14 @@
 import { type ReactNode } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 type AuthScreenLayoutProps = {
   title: string;
@@ -21,9 +23,11 @@ export function AuthScreenLayout({
   children,
   footer,
 }: AuthScreenLayoutProps) {
+    const { theme } = useTheme();
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+     style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
@@ -31,12 +35,14 @@ export function AuthScreenLayout({
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <View style={styles.logoMark}>
-            <Text style={styles.logoText}>V</Text>
+         <View style={[styles.logoMark, { backgroundColor: theme.colors.accent }]}>
+            <Text style={[styles.logoText, { color: theme.colors.inverseText }]}>V</Text>
           </View>
-          <Text style={styles.brand}>VizDict</Text>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text style={[styles.brand, { color: theme.colors.accent }]}>VizDict</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
+            {subtitle}
+          </Text>
         </View>
 
         <View style={styles.form}>{children}</View>
@@ -50,7 +56,6 @@ export function AuthScreenLayout({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7FAF8',
   },
   content: {
     flexGrow: 1,
@@ -66,18 +71,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#155E63',
     marginBottom: 16,
   },
   logoText: {
-    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '800',
   },
   brand: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#155E63',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: 10,
@@ -85,12 +87,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#13221F',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#64746F',
     lineHeight: 22,
   },
   form: {

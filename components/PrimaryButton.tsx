@@ -1,13 +1,15 @@
 import {
-    ActivityIndicator,
-    Pressable,
-    StyleSheet,
-    Text,
-    type PressableProps,
-    type PressableStateCallbackType,
-    type StyleProp,
-    type ViewStyle,
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  type PressableProps,
+  type PressableStateCallbackType,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 type PrimaryButtonProps = PressableProps & {
   title: string;
@@ -25,12 +27,19 @@ export function PrimaryButton({
   ...props
 }: PrimaryButtonProps) {
   const isDisabled = disabled || loading;
+  const { theme } = useTheme();
 
   return (
     <Pressable
       style={(state) => [
         styles.button,
-        variant === 'secondary' ? styles.secondary : styles.primary,
+         variant === 'secondary'
+          ? {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderWidth: 1,
+            }
+          : { backgroundColor: theme.colors.accent },
         state.pressed && !isDisabled && styles.pressed,
         isDisabled && styles.disabled,
         typeof style === 'function' ? style(state) : style,
@@ -38,13 +47,20 @@ export function PrimaryButton({
       disabled={isDisabled}
       {...props}
     >
-      {loading ? (
-        <ActivityIndicator color={variant === 'secondary' ? '#155E63' : '#FFFFFF'} />
-      ) : (
+      {loading ? ( 
+        <ActivityIndicator
+          color={variant === 'secondary' ? theme.colors.accent : theme.colors.inverseText}
+        />
+             ) : (
         <Text
           style={[
             styles.text,
-            variant === 'secondary' ? styles.secondaryText : styles.primaryText,
+           {
+              color:
+                variant === 'secondary'
+                  ? theme.colors.accent
+                  : theme.colors.inverseText,
+            },
           ]}
         >
           {title}
@@ -61,14 +77,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primary: {
-    backgroundColor: '#155E63',
-  },
-  secondary: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D6E0DC',
-  },
   pressed: {
     opacity: 0.9,
   },
@@ -78,11 +86,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  primaryText: {
-    color: '#FFFFFF',
-  },
-  secondaryText: {
-    color: '#155E63',
   },
 });
