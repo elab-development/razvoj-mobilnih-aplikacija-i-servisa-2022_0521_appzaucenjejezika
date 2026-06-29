@@ -62,7 +62,7 @@ export default function DictionaryLanguageScreen() {
         setLoading(false);
       },
       () => {
-        setError('Reci za ovaj jezik nisu mogle da se ucitaju.');
+        setError('Reči za ovaj jezik nisu mogle da se učitaju.');
         setLoading(false);
       },
     );
@@ -87,10 +87,10 @@ export default function DictionaryLanguageScreen() {
     return (
       <AppScreenLayout
         title="Dictionary"
-        subtitle="Trazeni jezik nije pronadjen u recniku."
+         subtitle="Traženi jezik nije pronađen u rečniku."
       >
         <View style={styles.statePanel}>
-          <Text style={styles.stateText}>Jezik nije podrzan.</Text>
+          <Text style={styles.stateText}>Jezik nije podržan.</Text>
         </View>
       </AppScreenLayout>
     );
@@ -99,13 +99,13 @@ export default function DictionaryLanguageScreen() {
   return (
     <AppScreenLayout
       title={language.label}
-      subtitle="Pretrazite sacuvane predmete za ovaj jezik i otvorite detalje reci."
+        subtitle="Pretražite sačuvane predmete za ovaj jezik i otvorite detalje reči."
     >
       <View style={styles.searchBox}>
         <Ionicons name="search-outline" size={20} color="#64746F" />
         <TextInput
           style={styles.searchInput}
-          placeholder="Pretrazi rec, prevod ili primer"
+          placeholder="Pretraži reč, prevod ili primer"
           placeholderTextColor="#8A9994"
           value={searchTerm}
           onChangeText={setSearchTerm}
@@ -120,7 +120,7 @@ export default function DictionaryLanguageScreen() {
       </View>
 
       <View style={styles.countPanel}>
-        <Text style={styles.countLabel}>Pronadjeno</Text>
+         <Text style={styles.countLabel}>Pronađeno</Text>
         <Text style={styles.countValue}>
           {filteredEntries.length} / {entries.length}
         </Text>
@@ -129,7 +129,7 @@ export default function DictionaryLanguageScreen() {
       {loading ? (
         <View style={styles.statePanel}>
           <ActivityIndicator color="#155E63" />
-          <Text style={styles.stateText}>Ucitavanje reci...</Text>
+          <Text style={styles.stateText}>Učitavanje reči...</Text>
         </View>
       ) : null}
 
@@ -141,7 +141,7 @@ export default function DictionaryLanguageScreen() {
 
       {!loading && !error && !entries.length ? (
         <View style={styles.statePanel}>
-          <Text style={styles.emptyTitle}>Nema sacuvanih reci za ovaj jezik.</Text>
+          <Text style={styles.emptyTitle}>Nema sačuvanih reči za ovaj jezik.</Text>
           <Text style={styles.stateText}>
             Na Scan strani izaberite {language.label} i pokrenite prepoznavanje.
           </Text>
@@ -151,7 +151,7 @@ export default function DictionaryLanguageScreen() {
       {!loading && !error && entries.length > 0 && !filteredEntries.length ? (
         <View style={styles.statePanel}>
           <Text style={styles.emptyTitle}>Nema rezultata.</Text>
-          <Text style={styles.stateText}>Probajte kracu ili drugaciju pretragu.</Text>
+         <Text style={styles.stateText}>Probajte kraću ili drugačiju pretragu.</Text>
         </View>
       ) : null}
 

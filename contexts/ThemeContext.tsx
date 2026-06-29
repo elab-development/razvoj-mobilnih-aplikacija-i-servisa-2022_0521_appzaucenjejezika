@@ -54,7 +54,7 @@ export const THEME_ACCENT_OPTIONS: ThemeAccentOption[] = [
   { key: 'green', label: 'Zelena', color: '#155E63' },
   { key: 'blue', label: 'Plava', color: '#2563EB' },
   { key: 'red', label: 'Crvena', color: '#DC2626' },
-  { key: 'orange', label: 'Narandzasta', color: '#EA580C' },
+  { key: 'orange', label: 'Narandžasta', color: '#EA580C' },
 ];
 
 const lightBase = {

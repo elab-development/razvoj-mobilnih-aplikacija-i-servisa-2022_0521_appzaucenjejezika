@@ -146,7 +146,7 @@ export default function UsageStatsScreen() {
         setLoading(false);
       },
       () => {
-        setError('Statistika nije mogla da se ucita.');
+        setError('Statistika nije mogla da se učita.');
         setLoading(false);
       },
     );
@@ -164,7 +164,7 @@ export default function UsageStatsScreen() {
   return (
     <AppScreenLayout
       title="Usage Stats"
-      subtitle="Pregled recnika po jezicima, mesecima i ukupnom koriscenju."
+      subtitle="Pregled rečnika po jezicima, mesecima i ukupnom korišćenju."
     >
       <Pressable style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={18} color="#155E63" />
@@ -174,7 +174,7 @@ export default function UsageStatsScreen() {
       {loading ? (
         <View style={styles.statePanel}>
           <ActivityIndicator color="#155E63" />
-          <Text style={styles.stateText}>Ucitavanje statistike...</Text>
+          <Text style={styles.stateText}>Učitavanje statistike...</Text>
         </View>
       ) : null}
 
@@ -188,7 +188,7 @@ export default function UsageStatsScreen() {
         <>
           <View style={styles.statsGrid}>
             <StatCard
-              label="Ukupno reci"
+              label="Ukupno reči"
               value={String(entries.length)}
               icon="library-outline"
             />
@@ -203,7 +203,7 @@ export default function UsageStatsScreen() {
               icon="calendar-outline"
             />
             <StatCard
-              label="Najvise koristite"
+              label="Najviše koristite"
               value={topLanguage?.language.label ?? '-'}
               icon="trophy-outline"
             />
@@ -224,7 +224,7 @@ export default function UsageStatsScreen() {
                   <View style={styles.languageTextBox}>
                     <Text style={styles.languageName}>{stat.language.label}</Text>
                     <Text style={styles.languageCount}>
-                      {stat.count === 1 ? '1 rec' : `${stat.count} reci`}
+                      {stat.count === 1 ? '1 reč' : `${stat.count} reči`}
                     </Text>
                   </View>
                 </View>
@@ -277,8 +277,8 @@ export default function UsageStatsScreen() {
 
             <Text style={styles.summaryText}>
               {entries.length
-                ? `Sacuvano je ${entries.length} reci kroz ${activeLanguages} jezika. Najaktivniji jezik je ${topLanguage?.language.label ?? 'n/a'}.`
-                : 'Jos nema sacuvanih reci. Kada dodate prve predmete, ovde ce se pojaviti pregled koriscenja.'}
+                             ? `Sačuvano je ${entries.length} reči kroz ${activeLanguages} jezika. Najaktivniji jezik je ${topLanguage?.language.label ?? 'n/a'}.`
+                : 'Još nema sačuvanih reči. Kada dodate prve predmete, ovde će se pojaviti pregled korišćenja.'}
             </Text>
           </View>
         </>

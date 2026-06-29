@@ -50,7 +50,7 @@ export default function DictionaryEntryDetailScreen() {
       (snapshot) => {
         if (!snapshot.exists()) {
           setEntry(null);
-          setError('Rec nije pronadjena.');
+          setError('Reč nije pronađena.');
           setLoading(false);
           return;
         }
@@ -61,7 +61,7 @@ export default function DictionaryEntryDetailScreen() {
         setLoading(false);
       },
       () => {
-        setError('Detalji reci nisu mogli da se ucitaju.');
+        setError('Detalji reči nisu mogli da se učitaju.');
         setLoading(false);
       },
     );
@@ -104,10 +104,10 @@ export default function DictionaryEntryDetailScreen() {
     return (
       <AppScreenLayout
         title="Dictionary"
-        subtitle="Trazeni jezik nije pronadjen u recniku."
+        subtitle="Traženi jezik nije pronađen u rečniku." 
       >
         <View style={styles.statePanel}>
-          <Text style={styles.stateText}>Jezik nije podrzan.</Text>
+                 <Text style={styles.stateText}>Jezik nije podržan.</Text>
         </View>
       </AppScreenLayout>
     );
@@ -116,7 +116,7 @@ export default function DictionaryEntryDetailScreen() {
   return (
     <AppScreenLayout
       title={entry?.translatedWord ?? language.label}
-      subtitle="Detalji sacuvane reci, primeri i podaci o slici."
+      subtitle="Detalji sačuvane reči, primeri i podaci o slici."
     >
       <Pressable style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={18} color="#155E63" />
@@ -126,7 +126,7 @@ export default function DictionaryEntryDetailScreen() {
       {loading ? (
         <View style={styles.statePanel}>
           <ActivityIndicator color="#155E63" />
-          <Text style={styles.stateText}>Ucitavanje detalja...</Text>
+          <Text style={styles.stateText}>Učitavanje detalja...</Text>
         </View>
       ) : null}
 

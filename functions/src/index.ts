@@ -15,8 +15,8 @@ const defaultOpenAIModel = 'gpt-5.4-mini';
 
 const languages = {
   en: { label: 'Engleski', promptName: 'English' },
-  de: { label: 'Nemacki', promptName: 'German' },
-  es: { label: 'Spanski', promptName: 'Spanish' },
+  de: { label: 'Nemački', promptName: 'German' },
+  es: { label: 'Španski', promptName: 'Spanish' },
   fr: { label: 'Francuski', promptName: 'French' },
   it: { label: 'Italijanski', promptName: 'Italian' },
   sr: { label: 'Srpski', promptName: 'Serbian in Latin script' },

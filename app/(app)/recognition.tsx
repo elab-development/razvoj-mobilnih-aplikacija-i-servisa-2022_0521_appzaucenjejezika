@@ -21,7 +21,7 @@ function getErrorMessage(error: unknown) {
     return error.message;
   }
 
-  return 'Prepoznavanje nije uspelo. Pokusajte ponovo.';
+   return 'Prepoznavanje nije uspelo. Pokušajte ponovo.'; 
 }
 
 export default function RecognitionScreen() {
@@ -54,12 +54,12 @@ export default function RecognitionScreen() {
 
   const handleRecognizeImage = async () => {
     if (!user) {
-      Alert.alert('Greska', 'Morate biti prijavljeni da sacuvate rec u recnik.');
+       Alert.alert('Greška', 'Morate biti prijavljeni da sačuvate reč u rečnik.');
       return;
     }
 
     if (!selectedImage) {
-      Alert.alert('Greska', 'Nema slike za prepoznavanje.');
+    Alert.alert('Greška', 'Nema slike za prepoznavanje.');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function RecognitionScreen() {
 
       setRecognitionResult(response.entry);
     } catch (error) {
-      Alert.alert('Greska', getErrorMessage(error));
+      Alert.alert('Greška', getErrorMessage(error));
     } finally {
       setRecognizing(false);
     }
@@ -94,7 +94,7 @@ export default function RecognitionScreen() {
     return (
       <AppScreenLayout
         title="Recognition"
-        subtitle="Slika nije prosledjena. Vratite se na skeniranje i izaberite novu sliku."
+        subtitle="Slika nije prosleđena. Vratite se na skeniranje i izaberite novu sliku."
       >
         <View style={styles.emptyPanel}>
           <Ionicons name="image-outline" size={44} color="#8A9994" />
@@ -109,7 +109,7 @@ export default function RecognitionScreen() {
   return (
     <AppScreenLayout
       title="Recognition"
-      subtitle={`Prepoznajte predmet i sacuvajte naziv, prevod i primere u privatni recnik. Izabrani jezik: ${targetLanguage.label}.`}
+      subtitle={`Prepoznajte predmet i sačuvajte naziv, prevod i primere u privatni rečnik. Izabrani jezik: ${targetLanguage.label}.`}
     >
       <View style={styles.previewPanel}>
         <Image source={{ uri: imageUri }} style={styles.previewImage} contentFit="cover" />
@@ -139,7 +139,7 @@ export default function RecognitionScreen() {
         <View style={styles.resultPanel}>
           <View style={styles.resultHeader}>
             <Ionicons name="checkmark-circle" size={22} color="#155E63" />
-            <Text style={styles.resultEyebrow}>Sacuvano u dictionary</Text>
+            <Text style={styles.resultEyebrow}>Sačuvano u rečnik</Text>
           </View>
 
           <View>
@@ -176,7 +176,7 @@ export default function RecognitionScreen() {
           ) : null}
 
           <PrimaryButton
-            title="Otvori recnik"
+            title="Otvori rečnik"
             variant="secondary"
             onPress={() => router.push('./dictionary')}
           />

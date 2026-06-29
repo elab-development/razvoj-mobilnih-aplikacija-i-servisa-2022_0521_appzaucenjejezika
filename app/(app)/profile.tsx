@@ -57,7 +57,7 @@ export default function ProfileScreen() {
     try {
       await logout();
     } catch {
-       Alert.alert('Greska', 'Odjava nije uspela. Pokusajte ponovo.');
+      Alert.alert('Greška', 'Odjava nije uspela. Pokušajte ponovo.');
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function ProfileScreen() {
   return (
    <AppScreenLayout
       title="Profile"
-      subtitle="Detalji naloga koji koristi vas privatni recnik."
+      subtitle="Detalji naloga koji koristi vaš privatni rečnik."
     >
        <View
         style={[
@@ -100,8 +100,8 @@ export default function ProfileScreen() {
 
         <ProfileActionCard
         icon="analytics-outline"
-        title="Statistika koriscenja"
-        text="Pregled sacuvanih reci po jezicima, mesecima i ritmu koriscenja."
+        title="Statistika korišćenja"
+        text="Pregled sačuvanih reči po jezicima, mesecima i ritmu korišćenja."
         onPress={() => router.push('/stats')}
       />
 

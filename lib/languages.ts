@@ -6,12 +6,12 @@ export const LANGUAGE_OPTIONS = [
   },
   {
     code: 'de',
-    label: 'Nemacki',
+    label: 'Nemački',
     promptName: 'German',
   },
   {
     code: 'es',
-    label: 'Spanski',
+   label: 'Španski',
     promptName: 'Spanish',
   },
   {

@@ -61,7 +61,7 @@ export default function DictionaryScreen() {
         setLoading(false);
       },
       () => {
-        setError('Recnik nije mogao da se ucita.');
+        setError('Rečnik nije mogao da se učita.'); 
         setLoading(false);
       },
     );
@@ -80,11 +80,11 @@ export default function DictionaryScreen() {
   return (
     <AppScreenLayout
       title="Dictionary"
-       subtitle="Izaberite jezik i otvorite sve predmete koje ste sacuvali za taj prevod."
+            subtitle="Izaberite jezik i otvorite sve predmete koje ste sačuvali za taj prevod."
        >
          <View style={styles.statsPanel}>
         <View>
-          <Text style={styles.statsLabel}>Ukupno reci</Text>
+          <Text style={styles.statsLabel}>Ukupno reči</Text>
           <Text style={styles.statsValue}>{totalEntries}</Text>
         </View>
         <View style={styles.statsIcon}>
@@ -95,7 +95,7 @@ export default function DictionaryScreen() {
       {loading ? (
         <View style={styles.statePanel}>
           <ActivityIndicator color="#155E63" />
-          <Text style={styles.stateText}>Ucitavanje jezika...</Text>
+         <Text style={styles.stateText}>Učitavanje jezika...</Text>
         </View>
       ) : null}
 

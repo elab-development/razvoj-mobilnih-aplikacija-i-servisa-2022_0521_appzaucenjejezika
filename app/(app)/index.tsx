@@ -53,7 +53,7 @@ export default function ScanScreen() {
         openRecognitionScreen(result.assets[0]);
       }
     } catch {
-      Alert.alert('Greska', 'Kamera nije mogla da se otvori.');
+      Alert.alert('Greška', 'Kamera nije mogla da se otvori.');
     } finally {
       setCameraLoading(false);
     }
@@ -84,7 +84,7 @@ export default function ScanScreen() {
         openRecognitionScreen(result.assets[0]);
       }
     } catch {
-      Alert.alert('Greska', 'Galerija nije mogla da se otvori.');
+      Alert.alert('Greška', 'Galerija nije mogla da se otvori.');
     } finally {
       setGalleryLoading(false);
     }
@@ -93,7 +93,7 @@ export default function ScanScreen() {
   return (
     <AppScreenLayout
       title="Scan"
-      subtitle="Prepoznajte predmet kamerom ili iz galerije, zatim sacuvajte prevod u privatni recnik."
+          subtitle="Prepoznajte predmet kamerom ili iz galerije, zatim sačuvajte prevod u privatni rečnik."
     >
       <View style={styles.scannerPanel}>
         <View style={styles.viewfinder}>
