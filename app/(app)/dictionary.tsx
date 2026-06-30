@@ -72,8 +72,8 @@ export default function DictionaryScreen() {
 
   const openLanguage = (languageCode: LanguageCode) => {
     router.push({
-      pathname: '/dictionary/[languageCode]',
-      params: { languageCode },
+    pathname: '/(app)/dictionary', // ili samo '/dictionary' ako dopušta, ali grupa foldera je najsigurnija
+    params: { languageCode: languageCode },
     });
   };
 

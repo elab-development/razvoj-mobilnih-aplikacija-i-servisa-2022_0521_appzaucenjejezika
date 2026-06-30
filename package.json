@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "build:preview:android": "eas build --platform android --profile preview",
     "functions:build": "npm run build --prefix functions",
     "deploy:functions": "npm run functions:build && firebase deploy --only functions",
     "deploy:rules": "firebase deploy --only firestore:rules,storage"
